@@ -6,7 +6,8 @@ import Vue from 'vue'
 import lynx from 'eos-transit-lynx-provider'
 
 const appName = 'effect_dashboard'
-const accessContext = initAccessContext({
+
+export const accessContext = initAccessContext({
   appName,
   network: {
     host: process.env.eosNodeUrl,
