@@ -52,6 +52,11 @@
                 Rewards
               </nuxt-link>
             </div>
+            <div @click="mobileMenu = false">
+              <nuxt-link class="navbar-item" to="/calculator" exact-active-class="is-active">
+                Calculator
+              </nuxt-link>
+            </div>
           </div>
           <div class="navbar-end">
               <div class="pt-0 navbar-item">
