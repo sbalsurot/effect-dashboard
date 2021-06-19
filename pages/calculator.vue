@@ -1,114 +1,263 @@
 <template>
-  <div>
-    <div class="box">
-      <h4 class="box-title subtitle">
-        Projected Distribution For Cycle {{ curCycleId }}
-      </h4>
-
-      <div class="table-container" />
-      <table class="table is-fullwidth is-size-6">
-        <thead>
-          <tr>
-            <th>Proposal ID</th>
-            <th>Total Vote Weights</th>
-            <th>Your Vote Weight</th>
-            <th>Projected Result</th>
-            <th>Cost</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="proposal in curCycleProposals" :key="proposal.id">
-            <td>{{ proposal.id }}</td>
-            <td>{{ (proposal.totalVoteWeight).toLocaleString() }}</td>
-            <td>{{ (proposal.yourVoteWeight).toLocaleString() }}</td>
-            <td>
-              <span v-if="proposal.projectedResult == 0" class="">Abstain (Rejected)</span>
-              <span v-if="proposal.projectedResult == 1" class="">Accepted</span>
-              <span v-if="proposal.projectedResult == 2" class="">Rejected</span>
-            </td>
-            <td>{{ (proposal.cost).toLocaleString() }} EFX</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="columns balances">
-        <div class="column">
-          <div class="box">
-            <h5 class="box-title subtitle">
-              DAO EFX Budget
-            </h5>
-            <div class="has-text-centered">
-              <div class="mb-3">
-                <div class="is-size-6">
-                  Total Budget
-                </div>
-                <div class="subtitle is-5 has-text-weight-semibold">
-                  {{ curCycleTotalBudget.toLocaleString() }}<span class="symbol"> EFX</span>
-                </div>
+  <div class="box">
+    <h4 class="box-title subtitle">
+      Projected Distribution For Cycle {{ curCycleId }}
+    </h4>
+    <div class="table-container" />
+    <table class="table is-fullwidth is-size-6">
+      <thead>
+        <tr>
+          <th>Proposal ID</th>
+          <th>Total Vote Weights</th>
+          <th>Your Vote Weight</th>
+          <th>Projected Result</th>
+          <th>Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="proposal in curCycleProposals" :key="proposal.id">
+          <td>{{ proposal.id }}</td>
+          <td>{{ (proposal.totalVoteWeight).toLocaleString() }}</td>
+          <td>{{ (proposal.yourVoteWeight).toLocaleString() }}</td>
+          <td>
+            <span v-if="proposal.projectedResult == 0" class="">Abstain (Rejected)</span>
+            <span v-if="proposal.projectedResult == 1" class="">Accepted</span>
+            <span v-if="proposal.projectedResult == 2" class="">Rejected</span>
+          </td>
+          <td>{{ (proposal.cost).toLocaleString() }} EFX</td>
+        </tr>
+      </tbody>
+    </table>
+    <!--      <pie-chart v-if="!loading" :data="getCombinedVoteWeightsChart" :options="chartOptions" />-->
+    <div class="columns balances">
+      <div class="column">
+        <div class="box">
+          <h5 class="box-title subtitle">
+            DAO Budget
+          </h5>
+          <div class="has-text-centered">
+            <div class="mb-3">
+              <div class="is-size-6">
+                Total Budget
               </div>
-              <div class="mb-3">
-                <div class="is-size-6">
-                  Expected Proposals Cost
-                </div>
-                <div class="subtitle is-5 has-text-weight-semibold">
-                  {{ totalPassingProposalCost.toLocaleString() }}<span class="symbol"> EFX</span>
-                </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ curCycleTotalBudget.toLocaleString() }}<span class="symbol"> EFX</span>
               </div>
-              <div class="mb-3">
-                <div class="is-size-6">
-                  Unused Budget
-                </div>
-                <div class="subtitle is-5 has-text-weight-semibold">
-                  {{ budgetRemaining.toLocaleString() }}<span class="symbol"> EFX</span>
-                </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Expected Proposals Cost
               </div>
-              <div class="mb-3">
-                <div class="is-size-6">
-                  30% of Unused Budget For Feepool
-                </div>
-                <div class="subtitle is-5 has-text-weight-semibold">
-                  {{ unusedBudgetFeepool.toLocaleString() }}<span class="symbol"> EFX</span>
-                </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ totalPassingProposalCost.toLocaleString() }}<span class="symbol"> EFX</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Unused Budget
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ budgetRemaining.toLocaleString() }}<span class="symbol"> EFX</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                30% of Unused Budget For Feepool
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ unusedBudgetFeepool.toLocaleString() }}<span class="symbol"> EFX</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Current Feepool
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ currFeepoolEFX.toLocaleString() }}<span class="symbol"> EFX</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="column">
-          <div class="box">
-            <h5 class="box-title subtitle">
-              DAO Vote Share
-            </h5>
-            <div class="has-text-centered">
-              <div class="mb-3">
-                <div class="is-size-6">
-                  Total Combined Vote Weights
-                </div>
-                <div class="subtitle is-5 has-text-weight-semibold">
-                  {{ totalProposalVoteWeights.toLocaleString() }}
-                </div>
+      </div>
+      <div class="column">
+        <div class="box">
+          <h5 class="box-title subtitle">
+            DAO Vote Share
+          </h5>
+          <div class="has-text-centered">
+            <div class="mb-3">
+              <div class="is-size-6">
+                Avg Total Vote Weights Per Proposal
               </div>
-              <div class="mb-3">
-                <div class="is-size-6">
-                  Your Combined Vote Weights
-                </div>
-                <div class="subtitle is-5 has-text-weight-semibold">
-                  {{ yourTotalProposalVoteWeights.toLocaleString() }}
-                </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ avgProposalVoteWeight.toLocaleString() }}
               </div>
-              <div class="mb-3">
-                <div class="is-size-6">
-                  Projected Feepool Share
-                </div>
-                <div class="subtitle is-5 has-text-weight-semibold">
-                  {{ (yourProjectedFeepoolShare * 100).toLocaleString() }}<span class="symbol"> %</span>
-                </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Total Combined Vote Weights
               </div>
-              <div class="mb-3">
-                <div class="is-size-6">
-                  Projected Feepool Rewards
-                </div>
-                <div class="subtitle is-5 has-text-weight-semibold">
-                  {{ (yourProjectedFeepoolRewards).toLocaleString() }}<span class="symbol"> EFX</span>
-                </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ totalProposalVoteWeights.toLocaleString() }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Your Combined Vote Weights
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ yourTotalProposalVoteWeights.toLocaleString() }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Projected Feepool Share
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (yourProjectedFeepoolShare * 100).toLocaleString() }}<span class="symbol"> %</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Projected Feepool Rewards
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (yourProjectedFeepoolRewards).toLocaleString() }}<span class="symbol"> EFX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <h4 class="box-title subtitle">
+      Custom Rewards Estimator
+    </h4>
+    <div class="columns balances">
+      <div class="column">
+        <div class="box">
+          <div class="has-text-centered">
+            <div class="mb-3">
+              <div class="is-size-6">
+                Your Staked EFX
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ curr_stakeEFX.toLocaleString() }} <span class="symbol"> EFX</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Stake Age
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (curr_stakeAge / (24 * 3600)).toLocaleString() }} <span class="symbol"> Days</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Your Effect Power
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ curr_EP.toLocaleString() }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Your Staked NFX
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (curr_stakeNFX).toLocaleString() }}<span class="symbol"> NFX</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Your Vote Weight
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (curr_voteweight).toLocaleString() }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="box">
+          <div class="has-text-centered">
+            <div class="mb-3">
+              <div class="is-size-6">
+                Your Staked EFX
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ calc_stakeEFX.toLocaleString() }} <span class="symbol"> EFX</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Stake Age
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (calc_stakeAge).toLocaleString() }} <span class="symbol"> Days</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Your Effect Power
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ calc_EP.toLocaleString() }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Your Staked NFX
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (calc_stakeNFX).toLocaleString() }}<span class="symbol"> NFX</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Your Vote Weight
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (calc_voteweight).toLocaleString() }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="box">
+          <div class="has-text-centered">
+            <div class="mb-3">
+              <div class="is-size-6">
+                Stake EFX
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                <input v-model="custom_stakeEFX" placeholder="edit me" type="number">
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Unstake EFX
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                <input v-model="custom_unstakeEFX" placeholder="edit me" type="number">
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Stake NFX
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                <input v-model="custom_stakeNFX" placeholder="edit me" type="number">
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Unstake NFX
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                <input v-model="custom_unstakeNFX" placeholder="edit me" type="number">
               </div>
             </div>
           </div>
@@ -123,8 +272,12 @@
 
 import { Serialize } from 'eosjs'
 import Long from 'long'
+// import PieChart from '@/components/PieChart.js'
 
 export default {
+  components: {
+    // PieChart
+  },
   data () {
     return {
       loading: true,
@@ -138,6 +291,27 @@ export default {
       unusedBudgetFeepool: 0,
       yourProjectedFeepoolRewards: 0,
       yourProjectedFeepoolShare: 0,
+      currFeepoolEFX: 0,
+      avgProposalVoteWeight: 0,
+      votersTotalVoteWeights: [],
+
+      curr_stakeEFX: 0,
+      curr_stakeNFX: 0,
+      curr_stakeAge: 0,
+      curr_EP: 0,
+      curr_voteweight: 0,
+
+      custom_stakeEFX: 0,
+      custom_unstakeEFX: 0,
+      custom_stakeNFX: 0,
+      custom_unstakeNFX: 0,
+
+      calc_stakeEFX: 0,
+      calc_stakeNFX: 0,
+      calc_stakeAge: 0,
+      calc_EP: 0,
+      calc_voteweight: 0,
+
       balances: [],
       claims: {},
       totalFees: null,
@@ -145,6 +319,8 @@ export default {
       lastCycleTotalWeight: null,
       lastCycleUserWeight: null,
       efxToken: process.env.efxToken,
+
+      chartOptions: { cutoutPercentage: 10 },
 
       // Testing/Dev
       isTestnet: process.env.eosNodeUrl.includes('kylin'),
@@ -179,6 +355,43 @@ export default {
     },
     genesisAirdrop () {
       return this.$wallet.genesisAirdrop
+    },
+    efxStaked () {
+      return this.$wallet.efxStaked
+    },
+    nfxStaked () {
+      return this.$wallet.nfxStaked
+    },
+    stakeAge () {
+      return this.$wallet.stakeAge
+    },
+    power () {
+      return this.$wallet.power
+    },
+    votes () {
+      return this.$wallet.calculateVotePower(this.$wallet.power, this.$wallet.nfxStaked)
+    },
+    getCombinedVoteWeightsChart () {
+      const voterLabels = []
+      const voterWeights = []
+
+      for (const key in this.votersTotalVoteWeights) {
+        voterLabels.push(key)
+        voterWeights.push(this.votersTotalVoteWeights[key])
+      }
+
+      return {
+        datasets: [
+          {
+            name: 'Voter Combined Weights',
+            backgroundColor: ['#0dd925', '#499166', '#fce68d', '#394dfa', '#d6fca4', '#7aa7ff', '#A4B8BB', '#7e8a8c'],
+            weight: 0.90,
+            labels: voterLabels,
+            data: voterWeights
+
+          }
+        ]
+      }
     }
   },
 
@@ -190,6 +403,18 @@ export default {
     lastCycleId () {
       this.resetValues()
       this.init()
+    },
+    custom_stakeEFX () {
+      this.setCalcStakedInfo()
+    },
+    custom_unstakeEFX () {
+      this.setCalcStakedInfo()
+    },
+    custom_stakeNFX () {
+      this.setCalcStakedInfo()
+    },
+    custom_unstakeNFX () {
+      this.setCalcStakedInfo()
     }
   },
 
@@ -236,14 +461,27 @@ export default {
           // ID
           proposalObj.id = proposal.id
           // Total Vote Weight
-          console.log('proposal', proposal.vote_counts)
+          // console.log('proposal', proposal.vote_counts)
           const voteCountsObj = {}
           for (const voteCount of proposal.vote_counts) {
             voteCountsObj[voteCount.key] = voteCount.value
           }
-          console.log('voteCountsObj', voteCountsObj)
+          // console.log('voteCountsObj', voteCountsObj)
           proposalObj.totalVoteWeight = voteCountsObj[0] + voteCountsObj[1] + voteCountsObj[2]
-          proposalObj.yourVoteWeight = await this.getMyVotes(proposal.id)
+          proposalObj.allVoters = await this.getProposalVotesList(proposal.id)
+          proposalObj.yourVoteWeight = 0
+          for (const voter of proposalObj.allVoters) {
+            if (this.votersTotalVoteWeights[voter.voter] !== undefined) {
+              this.votersTotalVoteWeights[voter.voter] += voter.weight
+            } else {
+              this.votersTotalVoteWeights[voter.voter] = voter.weight
+            }
+
+            if (voter.voter === this.accountName) {
+              proposalObj.yourVoteWeight = voter.weight
+            }
+          }
+          // console.log(proposalObj.allVoters)
           proposalObj.projectedResult = voteCountsObj[1] > voteCountsObj[2] ? '1' : '2'
 
           const proposalCostStr = proposal.pay[0].field_0.quantity
@@ -263,8 +501,44 @@ export default {
         this.yourProjectedFeepoolRewards = this.yourProjectedFeepoolShare * this.unusedBudgetFeepool
         this.curCycleProposals = proposals
       }
-      console.log('this.curCycleProposals', this.curCycleProposals)
+
+      this.avgProposalVoteWeight = this.totalProposalVoteWeights / this.curCycleProposals.length
+      console.log(this.$wallet.efxStaked)
+      // console.log('this.curCycleProposals', this.curCycleProposals)
+      this.setCurrStakedInfo()
       this.loading = false
+    },
+    setCurrStakedInfo () {
+      this.curr_stakeEFX = parseFloat(this.$wallet.efxStaked)
+      this.curr_stakeNFX = parseFloat(this.$wallet.nfxStaked)
+      this.curr_EP = parseFloat(this.$wallet.power)
+      this.curr_stakeAge = parseFloat(this.$wallet.stakeAge)
+      this.curr_voteweight = parseFloat(this.$wallet.calculateVotePower(this.curr_EP, this.curr_stakeNFX))
+
+      this.setCalcStakedInfo()
+    },
+    setCalcStakedInfo () {
+      const inputStakeEFX = this.custom_stakeEFX === '' ? 0 : parseFloat(this.custom_stakeEFX)
+      const inputUnstakeEFX = this.custom_unstakeEFX === '' ? 0 : parseFloat(this.custom_unstakeEFX)
+      const inputStakeNFX = this.custom_stakeNFX === '' ? 0 : parseFloat(this.custom_stakeNFX)
+      const inputUnstakeNFX = this.custom_unstakeNFX === '' ? 0 : parseFloat(this.custom_unstakeNFX)
+
+      // Stake EFX
+      this.calc_stakeEFX = this.curr_stakeEFX + inputStakeEFX
+      this.calc_stakeAge = this.curr_stakeAge * (this.curr_stakeEFX / this.calc_stakeEFX) / (24 * 3600)
+      // Unstake EFX
+      this.calc_stakeEFX = this.calc_stakeEFX - inputUnstakeEFX
+
+      // Effect Power
+      this.calc_EP = this.calc_stakeEFX + this.calc_stakeEFX * (this.calc_stakeAge / 200)
+
+      // Stake NFX
+      this.calc_stakeNFX = this.curr_stakeNFX + inputStakeNFX
+      // Unstake NFX
+      this.calc_stakeNFX = this.calc_stakeNFX - inputUnstakeNFX
+
+      // Vote Weight
+      this.calc_voteweight = Math.floor(Math.min(this.calc_stakeNFX, this.calc_EP / 20))
     },
     resetValues () {
       this.curCycleProposals = []
@@ -277,8 +551,25 @@ export default {
       this.unusedBudgetFeepool = 0
       this.yourProjectedFeepoolRewards = 0
       this.yourProjectedFeepoolShare = 0
+      this.votersTotalVoteWeights = []
+      this.currFeepoolEFX = 0
+      this.avgProposalVoteWeight = 0
+      this.custom_stakeEFX = 0
+      this.custom_unstakeEFX = 0
+      this.custom_stakeNFX = 0
+      this.custom_unstakeNFX = 0
+      this.curr_stakeEFX = 0
+      this.curr_stakeNFX = 0
+      this.curr_stakeAge = 0
+      this.curr_EP = 0
+      this.curr_voteweight = 0
+      this.calc_stakeEFX = 0
+      this.calc_stakeNFX = 0
+      this.calc_stakeAge = 0
+      this.calc_EP = 0
+      this.calc_voteweight = 0
     },
-    async getMyVotes (id) {
+    async getProposalVotesList (id) {
       // this.loading = true
       let votes = []
 
@@ -309,15 +600,9 @@ export default {
         } catch (e) {
           console.log(e)
         }
-
-        for (const voter of votes) {
-          if (voter.voter === this.accountName) {
-            return voter.weight
-          }
-        }
       }
 
-      return 0
+      return votes
     },
     calculateFees () {
       this.totalFees = Object.values(this.balances).reduce((acc, item) => {
