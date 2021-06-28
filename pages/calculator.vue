@@ -285,6 +285,14 @@
                 <input v-model="custom_stakeAge" type="text">
               </div>
             </div>
+            <div class="mb-3">
+              <div class="is-size-6">
+                Custom Feepool Bonus
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                <input v-model="custom_feepool_bonus" type="text">
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -324,10 +332,18 @@
             </div>
             <div class="mb-3">
               <div class="is-size-6">
+                Estimated EFX Feepool
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (curCycleProposalsDataObj.unusedBudgetFeepool + custom_feepool_bonus).toLocaleString() }} <span class="symbol"> EFX</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
                 Estimated EFX Governance Reward
               </div>
               <div class="subtitle is-5 has-text-weight-semibold">
-                {{ (curCycleProposalsDataObj.unusedBudgetFeepool * (curr_voteweight / (prevCycleProposalsDataObj.avgProposalVoteWeightMinusAccount + calc_voteweight))).toLocaleString() }} <span class="symbol"> EFX</span>
+                {{ ((curCycleProposalsDataObj.unusedBudgetFeepool + custom_feepool_bonus) * (curr_voteweight / (prevCycleProposalsDataObj.avgProposalVoteWeightMinusAccount + calc_voteweight))).toLocaleString() }} <span class="symbol"> EFX</span>
               </div>
             </div>
           </div>
@@ -365,10 +381,18 @@
             </div>
             <div class="mb-3">
               <div class="is-size-6">
+                Estimated EFX Feepool
+              </div>
+              <div class="subtitle is-5 has-text-weight-semibold">
+                {{ (curCycleProposalsDataObj.unusedBudgetFeepool + custom_feepool_bonus).toLocaleString() }} <span class="symbol"> EFX</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="is-size-6">
                 Estimated EFX Governance Reward
               </div>
               <div class="subtitle is-5 has-text-weight-semibold">
-                {{ (curCycleProposalsDataObj.unusedBudgetFeepool * (calc_voteweight / (prevCycleProposalsDataObj.avgProposalVoteWeightMinusAccount + calc_voteweight))).toLocaleString() }} <span class="symbol"> EFX</span>
+                {{ ((curCycleProposalsDataObj.unusedBudgetFeepool + custom_feepool_bonus) * (calc_voteweight / (prevCycleProposalsDataObj.avgProposalVoteWeightMinusAccount + calc_voteweight))).toLocaleString() }} <span class="symbol"> EFX</span>
               </div>
             </div>
           </div>
@@ -439,6 +463,7 @@ export default {
       custom_stakeNFX: '',
       custom_unstakeNFX: '',
       custom_stakeAge: '',
+      custom_feepool_bonus: '',
 
       calc_stakeEFX: 0,
       calc_stakeNFX: 0,
@@ -553,6 +578,9 @@ export default {
       this.setCalcStakedInfo()
     },
     custom_stakeAge () {
+      this.setCalcStakedInfo()
+    },
+    custom_feepool_bonus () {
       this.setCalcStakedInfo()
     }
   },
@@ -691,7 +719,9 @@ export default {
       const inputStakeNFX = Number.isInteger(parseFloat(this.custom_stakeNFX)) ? parseFloat(this.custom_stakeNFX) : 0
       const inputUnstakeNFX = Number.isInteger(parseFloat(this.custom_unstakeNFX)) ? parseFloat(this.custom_unstakeNFX) : 0
       const inputStakeAge = Number.isInteger(parseFloat(this.custom_stakeAge)) ? parseFloat(this.custom_stakeAge) : ''
+      const inputFeepoolBonus = Number.isInteger(parseFloat(this.custom_feepool_bonus)) ? parseFloat(this.custom_feepool_bonus) : ''
 
+      if (Number.isInteger(inputFeepoolBonus)) { this.custom_feepool_bonus = inputFeepoolBonus }
       // Stake EFX
       this.calc_stakeEFX = this.curr_stakeEFX + inputStakeEFX
       if (this.calc_stakeEFX > 0) {
